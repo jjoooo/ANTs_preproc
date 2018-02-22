@@ -34,22 +34,22 @@ def path_glob(ext, depth, data_name, path):
     return flair, t1, t2, gt
 
 
-def save_img(args, idx, label_bl=False):
+def save_img(idx, root_path, n_mode, slices_by_mode, volume_depth, label_bl=False):
     # Origin image
-    o_path = args.root_path+'/test_origin_PNG/{}'.format(idx)
+    o_path = root_path+'/test_origin_PNG/{}'.format(idx)
     if not os.path.exists(o_path):
         os.makedirs(o_path)
-    for m in range(args.n_mode-1):
-        for slx in range(args.volume_depth):
-            io.imsave(o_path+'/{}_origin.PNG'.format(slx), args.slices_by_mode[m][slx])
+    for m in range(n_mode-1):
+        for slx in range(volume_depth):
+            io.imsave(o_path+'/{}_origin.PNG'.format(slx), slices_by_mode[m][slx])
 
     # Label image (no label on real data)
     if label_bl:
-        l_path = args.root_path+'/test_label_PNG/{}'.format(idx)
+        l_path = root_path+'/test_label_PNG/{}'.format(idx)
         if not os.path.exists(l_path):
             os.makedirs(l_path)
-        for slx in range(args.volume_depth):
-            io.imsave(l_path+'/{}_label.PNG'.format(slx), args.slices_by_mode[-1][slx])
+        for slx in range(volume_depth):
+            io.imsave(l_path+'/{}_label.PNG'.format(slx), slices_by_mode[-1][slx])
 
 
 def init_model(args, n4b):

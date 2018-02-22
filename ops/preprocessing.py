@@ -50,7 +50,7 @@ class Preprocessing(object):
     # Bias correction using ANTs scripts
     def atroposN4_norm(self, img, mask, output, dim):
         subprocess.call(scripts_dir+'antsAtroposN4.sh -d '+dim+' -a '+img+' -x '+mask+ \
-                        ' -p '+data_dir+'priorWarped%d.nii.gz -c 3 -y 2 -y 3 -w 0.25 -o '+output+'/output/', shell = True)
+                        ' -p '+data_dir+'priorWarped%d.nii.gz -c 3 -y 2 -y 3 -w 0.25 -o '+output, shell = True)
         res_path = glob(output+'*N4.nii*')
         result = io.imread(res_path[0], plugin='simpleitk').astype(float)
         result = self._normalize(result)
@@ -98,7 +98,7 @@ class Preprocessing(object):
             mode = [t1, gt]
             for m in range(len(mode)-1):
                 for slx in range(len(mode[0])):
-                    self.slices_by_mode[m][slx] = self.atroposN4_norm(mode[m][slx],mode[-1][slx],patient,'2')
+                    self.slices_by_mode[m][slx] = self.atroposN4_norm(mode[m][slx],mode[-1][slx],patient+'/output/','2')
 
         else:
             mode = [flair[0], t1[0], t2[0], gt[0]]
@@ -167,11 +167,11 @@ class Preprocessing(object):
             pl = MakePatches(self.args, self.args.n_patch/len(self.patients), self.train_bool)
 
             if self.data_name == 'YS':
-                save_img(self.args, idx)
+                save_img(idx, self.root_path, self.args.n_mode, self.slices_by_mode, self.volume_depth)
                 l_p = pl.create_2Dpatches_YS(self.slices_by_mode, p_path+val_str, idx)
                 len_patch += l_p
             else: 
-                save_img(self.args, idx, True)
+                save_img(idx, self.root_path, self.args.n_mode, self.slices_by_mode, self.volume_depth, True)
                 l_p = pl.create_2Dpatches(self.slices_by_mode, p_path+val_str, idx)
                 len_patch += l_p
             
