@@ -62,7 +62,7 @@ def testing(args, test_batch, models, idx):
 
             if h1 < 0 or h2 > args.volume_size or w1 < 0 or w2 > args.volume_size:
                 continue
-            mid = int(args.patch_size/4) 
+            mid = int(args.patch_size/8) 
             output_prob[z, h1+mid:h2-mid, w1+mid:w2-mid] += out_arr[bc][0]
 
 
@@ -80,7 +80,7 @@ def save_result(args, output_prob, idx):
         os.makedirs(path)
 
     thsd = 0.2
-    output_prob[output_prob<thsd] = 0 
+    output_prob[output_prob<thsd] = 0
 
     output_prob = (output_prob-np.min(output_prob))/(np.max(output_prob)-np.min(output_prob))
     print('after minmax \noutput_prob : min={}, max={}\n'.format(np.min(output_prob),np.max(output_prob)))
@@ -155,7 +155,7 @@ def save_result(args, output_prob, idx):
         i = 0
         for slice_ori, slice_inf in zip(vol,vol_inf):
             concat_img = np.concatenate((slice_ori,slice_inf), axis=1)
-            if i> len(origin_path)-1:
+            if i> 10:
                 break
             io.imsave(path+'/{}_predict.PNG'.format(i), concat_img)
             #io.imsave(path+'/{}_predict_inf.PNG'.format(i), slice_inf)

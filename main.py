@@ -26,10 +26,10 @@ warnings.filterwarnings("ignore")
 parser = argparse.ArgumentParser()
 parser.add_argument("--gpu_idx",type=int,default=0)
 parser.add_argument("--n_epoch",type=int,default=100)
-parser.add_argument("--patch_size",type=int,default=16)
-parser.add_argument("--n_patch",type=int,default=1000)
-parser.add_argument("--batch_size",type=int,default=1024)
-parser.add_argument("--root",type=str,default='/Users/jui/Downloads/Data/')
+parser.add_argument("--patch_size",type=int,default=64)
+parser.add_argument("--n_patch",type=int,default=10000000)
+parser.add_argument("--batch_size",type=int,default=3072)
+parser.add_argument("--root",type=str,default='/mnt/disk1/data/MRI_Data/')
 parser.add_argument("--data_name",type=str,default='YS')
 parser.add_argument("--n_class",type=int,default=2)
 parser.add_argument("--n_mode",type=int,default=2)
@@ -39,8 +39,8 @@ parser.add_argument("--tr_dim",type=int,default=2)
 parser.add_argument("--tr_bl",type=int,default=1)
 args = parser.parse_args()
 
-#use_gpu = '{},{}'.format(args.gpu_idx,args.gpu_idx+1)
-#os.environ["CUDA_VISIBLE_DEVICES"]=use_gpu
+use_gpu = '{},{}'.format(args.gpu_idx,args.gpu_idx+1)
+os.environ["CUDA_VISIBLE_DEVICES"]=use_gpu
 
 n_channel = 1
 out_dim = 2
@@ -52,20 +52,20 @@ n4b_apply = True # Perform N4 bias correction (if not is_exist corrected image: 
 print('----------------------------------------------')
 print(args)
 print('----------------------------------------------')
-'''
+
 # Init models
 models, model_path = init_model(args, n4b)
 
 # Init optimizer, loss function
 optimizer = torch.optim.Adam(models[2].parameters(), lr=args.learning_rate) # classifier optimizer
 loss_func = nn.BCEWithLogitsLoss().cuda()
-'''
+
 # Preprocessing
 pp = Preprocessing(args, n4b, n4b_apply)
 p_path, all_len = pp.preprocess()
 
 
-'''
+
 if args.tr_bl == 1 and args.data_name != 'YS':
 
     # Create data batch
@@ -112,4 +112,4 @@ else:
         for b in val_batch:
             testing(args, b, models, idx)
             idx += 1
-'''
+
