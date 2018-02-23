@@ -33,7 +33,6 @@ def path_glob(ext, depth, data_name, path):
 
     return flair, t1, t2, gt
 
-
 def save_img(idx, root_path, n_mode, slices_by_mode, volume_depth, label_bl=False):
     # Origin image
     o_path = root_path+'/test_origin_PNG/{}'.format(idx)

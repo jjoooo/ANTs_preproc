@@ -15,8 +15,8 @@ warnings.filterwarnings("ignore")
 
 import subprocess
 
-scripts_dir = '/Users/jui/Downloads/Source/ANTs/Scripts/'
-data_dir = '/Users/jui/Downloads/Data/YS/MS/0/'
+scripts_dir = '/mnt/disk2/source/ANTs/Scripts/'
+
 
 
 # Preprocessing
@@ -38,6 +38,7 @@ class Preprocessing(object):
             self.ext = '.dcm'
             self.patients = glob(self.path + '/**')
             self.volume_depth = len(glob(self.patients[0]+'/*.nii'))
+            print(self.patients[0])
             
         else:
             self.path = self.root_path + '/training'
@@ -46,11 +47,12 @@ class Preprocessing(object):
             self.volume_depth =  args.volume_size
             
         self.slices_by_mode = np.zeros((self.args.n_mode, self.volume_depth, args.volume_size, args.volume_size))
- 
+        print(self.slices_by_mode.shape)
+        self.data_dir = self.path + '/0/'
     # Bias correction using ANTs scripts
     def atroposN4_norm(self, img, mask, output, dim):
         subprocess.call(scripts_dir+'antsAtroposN4.sh -d '+dim+' -a '+img+' -x '+mask+ \
-                        ' -p '+data_dir+'priorWarped%d.nii.gz -c 3 -y 2 -y 3 -w 0.25 -o '+output, shell = True)
+                        ' -p '+self.data_dir+'priorWarped%d.nii.gz -c 3 -y 2 -y 3 -w 0.25 -o '+output, shell = True)
         res_path = glob(output+'*N4.nii*')
         result = io.imread(res_path[0], plugin='simpleitk').astype(float)
         result = self._normalize(result)
@@ -98,8 +100,11 @@ class Preprocessing(object):
             mode = [t1, gt]
             for m in range(len(mode)-1):
                 for slx in range(len(mode[0])):
-                    self.slices_by_mode[m][slx] = self.atroposN4_norm(mode[m][slx],mode[-1][slx],patient+'/output/','2')
-
+                    result = self.atroposN4_norm(mode[m][slx],mode[-1][slx],patient+'/output/','2')
+                    result = self._normalize(result)
+                    result /= np.max(result)
+                    
+                    self.slices_by_mode[m][slx] = result
         else:
             mode = [flair[0], t1[0], t2[0], gt[0]]
 
@@ -122,13 +127,14 @@ class Preprocessing(object):
     def preprocess(self):
         print('\nCreate patches...')
 
-        p_path = self.root_path+'/patch/patch_{}'.format(self.args.patch_size)
+        p_path = self.root_path+'/patch/mode_{}/patch_{}'.format(self.args.n_mode, self.args.patch_size)
         val_str = ''
 
         create_folder(p_path)
 
         if self.data_name == 'YS':
-            if len(glob(p_path+'/test_ys/0/0/**')) == self.volume_depth:
+            if len(glob(p_path+'/test_ys/0/0/**')) > 10:
+                print(p_path)
                 print('YS Done.\n')
                 return p_path, 0
         else:
@@ -170,8 +176,8 @@ class Preprocessing(object):
                 save_img(idx, self.root_path, self.args.n_mode, self.slices_by_mode, self.volume_depth)
                 l_p = pl.create_2Dpatches_YS(self.slices_by_mode, p_path+val_str, idx)
                 len_patch += l_p
-            else: 
-                save_img(idx, self.root_path, self.args.n_mode, self.slices_by_mode, self.volume_depth, True)
+            else:
+                save_img(idx, self.root_path, self.args.n_mode, self.slices_by_mode, self.volume_depth, True) 
                 l_p = pl.create_2Dpatches(self.slices_by_mode, p_path+val_str, idx)
                 len_patch += l_p
             

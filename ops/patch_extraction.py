@@ -160,18 +160,18 @@ class MakePatches(object):
         return n_patch
 
 
-    def create_2Dpatches_YS(self, volume, p_path, idx):
+    def create_2Dpatches_YS(self, img, p_path, idx):
 
         # random patch each class
-        n_mode = len(volume)
-        print('volume mean = {}, max = {}'.format(np.mean(volume), np.max(volume)))
-        depth = len(volume[0])
+        n_mode = len(img)
+        print('volume mean = {}, max = {}'.format(np.mean(img), np.max(img)))
+        depth = len(img[0])
         n_patch = 0
         strd = 2
         for m in range(n_mode):
             
             for d in range(depth):
-                sl = volume[m,d]
+                sl = img[m,d]
                 print('slice {} = {}'.format(d, np.mean(sl)))
                 height,width = sl.shape
                 
