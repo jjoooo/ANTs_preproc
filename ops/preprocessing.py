@@ -52,7 +52,7 @@ class Preprocessing(object):
     # Bias correction using ANTs scripts
     def atroposN4_norm(self, img, mask, output, dim):
         subprocess.call(scripts_dir+'antsAtroposN4.sh -d '+dim+' -a '+img+' -x '+mask+ \
-                        ' -p '+self.data_dir+'priorWarped%d.nii.gz -c 3 -y 2 -y 3 -w 0.25 -o '+output, shell = True)
+                        ' -c 2 -y 2 -y 3 -w 0.25 -o '+output, shell = True)
         res_path = glob(output+'*N4.nii*')
         result = io.imread(res_path[0], plugin='simpleitk').astype(float)
         result = self._normalize(result)
