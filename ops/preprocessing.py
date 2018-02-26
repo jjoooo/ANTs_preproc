@@ -77,9 +77,8 @@ class Preprocessing(object):
     # Zero mean
     def _normalize(self, slice):
         # remove outlier
-        if self.data_name != 'YS':
-            b, t = np.percentile(slice, (1,99))
-            slice = np.clip(slice, 0, t)
+        b, t = np.percentile(slice, (1,99))
+        slice = np.clip(slice, 0, t)
         slice[slice<0] = 0
         if np.std(slice) == 0: 
             return slice
