@@ -49,6 +49,7 @@ class Preprocessing(object):
         self.slices_by_mode = np.zeros((self.args.n_mode, self.volume_depth, args.volume_size, args.volume_size))
         print(self.slices_by_mode.shape)
         self.data_dir = self.path + '/0/'
+        
     # Bias correction using ANTs scripts
     def atroposN4_norm(self, img, mask, output, dim):
         subprocess.call(scripts_dir+'antsAtroposN4.sh -d '+dim+' -a '+img+' -x '+mask+ \
